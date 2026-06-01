@@ -182,9 +182,9 @@ Tests cover all major modules with 30+ test functions:
 
 | Name | Role |
 |---|---|
-| Member 1 | Book & Loan Module |
-| Member 2 | Member Management & UI |
-| Member 3 | File Handling & Testing |
+| Umair Ali | Backend and the main program in python + basic idea |
+| Haroon Khalid | Frontend Design and its development |
+| Atiqa Saleem | Managing data and files, data handling and testing + final reports |
 
 ---
 
