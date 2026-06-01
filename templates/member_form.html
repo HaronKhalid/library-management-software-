@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Register Member - SmartLMS{% endblock %}
+
+{% block header_title %}Register New Member{% endblock %}
+{% block header_subtitle %}Create a new reader account to issue borrowing privileges{% endblock %}
+
+{% block content %}
+<section class="panel" style="max-width: 600px; margin: 0 auto 2.5rem auto;" id="member-form-panel">
+    <div class="panel-header">
+        <h2 class="panel-title">👤 Member Profile Details</h2>
+    </div>
+
+    <form method="POST" action="{{ url_for('member_register') }}" class="member-form">
+        <div class="form-grid" style="grid-template-columns: 1fr;">
+            <!-- Name -->
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Haroon Khalid" required>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="e.g. haroon@example.com" required>
+            </div>
+
+            <!-- Phone -->
+            <div class="form-group">
+                <label for="phone">Phone Number *</label>
+                <input type="text" id="phone" name="phone" class="form-control" placeholder="e.g. 0300-1234567" required>
+            </div>
+
+            <!-- Membership Type -->
+            <div class="form-group">
+                <label for="membership_type">Membership Type</label>
+                <select id="membership_type" name="membership_type" class="form-control" required>
+                    <option value="Standard">Standard (Limit: 5 books, period: 14 days)</option>
+                    <option value="Premium">Premium (Enhanced status)</option>
+                    <option value="Student">Student (Academic account)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 1.5rem;">
+            <a href="{{ url_for('members') }}" class="btn btn-secondary" id="btn-member-form-cancel">Cancel</a>
+            <button type="submit" class="btn btn-primary" id="btn-member-form-submit">👤 Register Member</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

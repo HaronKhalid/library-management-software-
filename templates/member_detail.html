@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Member Profile - SmartLMS{% endblock %}
+
+{% block header_title %}{{ member.name }}{% endblock %}
+{% block header_subtitle %}Member profile overview, borrow limit status, and transaction history{% endblock %}
+
+{% block content %}
+<div class="detail-layout">
+    <!-- Sidebar Details -->
+    <aside class="detail-sidebar" id="member-detail-sidebar">
+        <div class="profile-card">
+            <div class="profile-avatar" style="background: var(--primary-gradient);">👤</div>
+            <h2 class="profile-name">{{ member.name }}</h2>
+            <p class="profile-role">
+                <span class="badge {% if member.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                    {% if member.is_active %}Active Member{% else %}Suspended{% endif %}
+                </span>
+            </p>
+            
+            <ul class="info-list">
+                <li class="info-item">
+                    <span class="info-label">Member ID</span>
+                    <span class="info-value"><code>{{ member.person_id }}</code></span>
+                </li>
+                <li class="info-item">
+                    <span class="info-label">Email</span>
+                    <span class="info-value"><small>{{ member.email }}</small></span>
+                </li>
+                <li class="info-item">
+                    <span class="info-label">Phone</span>
+                    <span class="info-value"><code>{{ member.phone }}</code></span>
+                </li>
+                <li class="info-item">
+                    <span class="info-label">Membership</span>
+                    <span class="info-value">{{ member.membership_type }}</span>
+                </li>
+                <li class="info-item">
+                    <span class="info-label">Registered On</span>
+                    <span class="info-value"><small>{{ member.created_at }}</small></span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Action Panel -->
+        <section class="panel" style="padding: 1.5rem;" id="member-action-panel">
+            <h3 class="panel-title" style="font-size: 1.1rem; margin-bottom: 1rem;">Privilege Controls</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <form action="{{ url_for('member_toggle', member_id=member.person_id) }}" method="POST">
+                    <button type="submit" class="btn {% if member.is_active %}btn-danger{% else %}btn-success{% endif %}" style="width: 100%;" id="btn-toggle-privilege">
+                        {% if member.is_active %}🔒 Suspend Privileges{% else %}🔓 Restore Privileges{% endif %}
+                    </button>
+                </form>
+                <a href="{{ url_for('loans') }}" class="btn btn-primary" id="btn-issue-book-member">🔄 Issue Book Loan</a>
+                <a href="{{ url_for('members') }}" class="btn btn-secondary" style="text-align: center;" id="btn-members-back">← Back to Registry</a>
+            </div>
+        </section>
+    </aside>
+
+    <!-- Main Activities Logs -->
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+        <!-- Borrowing Limit Indicator -->
+        <section class="panel" id="limits-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">📊 Loan Allowance</h2>
+                <span class="badge badge-returned">{{ active_loans|length }} / {{ member.MAX_BARROW_LIMIT if member.MAX_BORROW_LIMIT is defined else 5 }} checked out</span>
+            </div>
+            <div style="background-color: var(--bg-card); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 10px;">
+                {% set limit = member.MAX_BORROW_LIMIT if member.MAX_BORROW_LIMIT is defined else 5 %}
+                {% set percentage = (active_loans|length / limit) * 100 %}
+                <div style="background: var(--primary-gradient); width: {{ percentage }}%; height: 100%; border-radius: 4px; transition: var(--transition);"></div>
+            </div>
+        </section>
+
+        <!-- Active Loans Section -->
+        <section class="panel" id="active-loans-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">🔄 Active Book Checkouts</h2>
+                <span class="badge badge-overdue">{{ active_loans|length }} Books</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Issued Date</th>
+                            <th>Due Date</th>
+                            <th>Fines Accrued</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loan in active_loans %}
+                        <tr>
+                            <td>
+                                <strong>{{ loan.book_title }}</strong><br>
+                                <small class="text-muted">ID: {{ loan.book_id }}</small>
+                            </td>
+                            <td>{{ loan.borrow_date[:10] }}</td>
+                            <td>
+                                <span>{{ loan.due_date }}</span>
+                                {% if loan.is_overdue() %}
+                                    <span class="badge badge-overdue" style="padding: 1px 6px; font-size: 0.7rem; border-radius: 4px; margin-left: 5px;">Overdue</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if loan.is_overdue() %}
+                                    <span style="color: var(--danger); font-weight: bold;">PKR {{ "%.0f"|format(loan.calculate_fine()) }}</span>
+                                {% else %}
+                                    <span class="text-muted">PKR 0.00</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right;">
+                                <form action="{{ url_for('loan_return', loan_id=loan.loan_id) }}" method="POST" style="display:inline;">
+                                    <input type="hidden" name="redirect_url" value="{{ request.path }}">
+                                    <button type="submit" class="btn btn-success btn-sm" id="btn-return-{{ loan.loan_id }}">↩️ Check-in (Return)</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-muted" style="text-align: center; padding: 2rem;">
+                                No books currently borrowed.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Historical Loans Section -->
+        <section class="panel" id="history-loans-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">📚 Historical Loans Logs</h2>
+                <span class="badge badge-returned">{{ historical_loans|length }} Completed</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Borrowed On</th>
+                            <th>Returned On</th>
+                            <th>Fine Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loan in historical_loans %}
+                        <tr>
+                            <td>
+                                <strong>{{ loan.book_title }}</strong><br>
+                                <small class="text-muted">ID: {{ loan.book_id }}</small>
+                            </td>
+                            <td>{{ loan.borrow_date[:10] }}</td>
+                            <td>{{ loan.return_date[:10] if loan.return_date else 'N/A' }}</td>
+                            <td>
+                                {% if loan.fine_amount > 0 %}
+                                    <span style="color: var(--warning);">PKR {{ "%.2f"|format(loan.fine_amount) }}</span>
+                                {% else %}
+                                    <span class="text-muted">None</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-muted" style="text-align: center; padding: 2rem;">
+                                No history found for this account.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

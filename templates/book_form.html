@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}{% if book %}Edit Book - SmartLMS{% else %}Add Book - SmartLMS{% endblock %}{% endif %}
+
+{% block header_title %}{% if book %}Edit Book: {{ book.title }}{% else %}Add New Book{% endblock %}{% endif %}
+{% block header_subtitle %}{% if book %}Modify catalog record details{% else %}Enter book parameters to insert into inventory{% endblock %}{% endif %}
+
+{% block content %}
+<section class="panel" style="max-width: 800px; margin: 0 auto 2.5rem auto;" id="book-form-panel">
+    <div class="panel-header">
+        <h2 class="panel-title">📋 Book Parameters</h2>
+    </div>
+
+    <form method="POST" action="{% if book %}{{ url_for('book_edit', book_id=book.book_id) }}{% else %}{{ url_for('book_add') }}{% endif %}" class="book-form">
+        <div class="form-grid">
+            <!-- Title -->
+            <div class="form-group full-width">
+                <label for="title">Book Title *</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Introduction to Algorithms" value="{% if book %}{{ book.title }}{% endif %}" required>
+            </div>
+
+            <!-- Author -->
+            <div class="form-group">
+                <label for="author">Author *</label>
+                <input type="text" id="author" name="author" class="form-control" placeholder="e.g. Thomas H. Cormen" value="{% if book %}{{ book.author }}{% endif %}" required>
+            </div>
+
+            <!-- ISBN -->
+            <div class="form-group">
+                <label for="isbn">ISBN *</label>
+                <input type="text" id="isbn" name="isbn" class="form-control" placeholder="e.g. 978-0262033848" value="{% if book %}{{ book.isbn }}{% endif %}" {% if book %}readonly style="background-color: var(--bg-app); opacity: 0.7; cursor: not-allowed;"{% endif %} required>
+                {% if book %}<small class="text-muted">ISBN code cannot be altered once registered.</small>{% endif %}
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="category" class="form-control" required>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {% if book and book.category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Publication Year -->
+            <div class="form-group">
+                <label for="publication_year">Publication Year</label>
+                <input type="number" id="publication_year" name="publication_year" class="form-control" min="1000" max="2100" placeholder="e.g. 2009" value="{% if book %}{{ book.publication_year }}{% else %}{{ current_year }}{% endif %}" required>
+            </div>
+
+            <!-- Total Copies -->
+            {% if not book %}
+            <div class="form-group">
+                <label for="total_copies">Number of Copies *</label>
+                <input type="number" id="total_copies" name="total_copies" class="form-control" min="1" max="100" value="1" required>
+                <small class="text-muted">Default is 1 copy. Range: 1 - 100.</small>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('books') }}" class="btn btn-secondary" id="btn-form-cancel">Cancel</a>
+            <button type="submit" class="btn btn-primary" id="btn-form-submit">
+                {% if book %}💾 Save Changes{% else %}➕ Add Book{% endif %}
+            </button>
+        </div>
+    </form>
+</section>
+{% endblock %}

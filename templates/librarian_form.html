@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Add Librarian - SmartLMS{% endblock %}
+
+{% block header_title %}Add Librarian Staff{% endblock %}
+{% block header_subtitle %}Add a library employee with administrative privileges{% endblock %}
+
+{% block content %}
+<section class="panel" style="max-width: 600px; margin: 0 auto 2.5rem auto;" id="librarian-form-panel">
+    <div class="panel-header">
+        <h2 class="panel-title">👔 Staff Profile Details</h2>
+    </div>
+
+    <form method="POST" action="{{ url_for('librarian_add') }}" class="librarian-form">
+        <div class="form-grid" style="grid-template-columns: 1fr;">
+            <!-- Name -->
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Ms. Samreen" required>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="e.g. samreen@library.pk" required>
+            </div>
+
+            <!-- Phone -->
+            <div class="form-group">
+                <label for="phone">Phone Number *</label>
+                <input type="text" id="phone" name="phone" class="form-control" placeholder="e.g. 0321-1111111" required>
+            </div>
+
+            <!-- Employee ID -->
+            <div class="form-group">
+                <label for="employee_id">Employee ID *</label>
+                <input type="text" id="employee_id" name="employee_id" class="form-control" placeholder="e.g. EMP-002" required>
+            </div>
+
+            <!-- Department -->
+            <div class="form-group">
+                <label for="department">Department</label>
+                <input type="text" id="department" name="department" class="form-control" placeholder="e.g. Management" value="General">
+            </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 1.5rem;">
+            <a href="{{ url_for('members') }}" class="btn btn-secondary" id="btn-lib-form-cancel">Cancel</a>
+            <button type="submit" class="btn btn-primary" id="btn-lib-form-submit">👔 Add Librarian</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

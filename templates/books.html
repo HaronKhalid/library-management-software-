@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Book Catalog - SmartLMS{% endblock %}
+
+{% block header_title %}Book Catalog{% endblock %}
+{% block header_subtitle %}Browse, filter, and manage books in the library{% endblock %}
+
+{% block content %}
+<section class="panel" id="catalog-panel">
+    <div class="panel-header">
+        <h2 class="panel-title">📚 Books Catalogue</h2>
+        <a href="{{ url_for('book_add') }}" class="btn btn-primary btn-sm" id="btn-catalog-add">➕ Add New Book</a>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="filter-bar" id="category-filters">
+        <a href="{{ url_for('books') }}" class="filter-chip {% if not selected_category and not available_only %}active{% endif %}">
+            All Categories
+        </a>
+        <a href="{{ url_for('books', available_only='true') }}" class="filter-chip {% if available_only %}active{% endif %}">
+            Available Only
+        </a>
+        {% for category in categories %}
+            <a href="{{ url_for('books', category=category) }}" class="filter-chip {% if selected_category == category %}active{% endif %}">
+                {{ category }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Books Table -->
+    <div class="table-responsive">
+        <table class="table" id="books-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Book details</th>
+                    <th>ISBN</th>
+                    <th>Category</th>
+                    <th>Availability</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr id="book-row-{{ book.book_id }}">
+                    <td><code>{{ book.book_id }}</code></td>
+                    <td>
+                        <strong>{{ book.title }}</strong><br>
+                        <span class="text-muted">by {{ book.author }}</span>
+                    </td>
+                    <td><code>{{ book.isbn }}</code></td>
+                    <td><span class="badge badge-category">{{ book.category }}</span></td>
+                    <td>
+                        {% if book.is_available() %}
+                            <span class="badge badge-active">Available ({{ book.available_copies }}/{{ book.total_copies }})</span>
+                        {% else %}
+                            <span class="badge badge-overdue">Out of Stock (0/{{ book.total_copies }})</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                        <div style="display: inline-flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                            <a href="{{ url_for('book_detail', book_id=book.book_id) }}" class="btn btn-secondary btn-sm" id="btn-view-{{ book.book_id }}">👁️ View</a>
+                            <a href="{{ url_for('book_edit', book_id=book.book_id) }}" class="btn btn-secondary btn-sm" style="color: var(--primary-color);" id="btn-edit-{{ book.book_id }}">✏️ Edit</a>
+                            <form action="{{ url_for('book_delete', book_id=book.book_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this book? This cannot be undone.');" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" id="btn-delete-{{ book.book_id }}">🗑️ Remove</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-muted" style="text-align: center; padding: 3rem;">
+                        No books match the selected filter. Try adding a new book!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
