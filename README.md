@@ -98,19 +98,32 @@ cd LibraryMS
 
 # Install dependencies
 pip install -r requirements.txt
+```
 
-# Run the application
+### Running the Application
+
+You can run the application in two modes:
+
+#### 1. Web UI Interface (Recommended 🌐)
+Build using Flask, providing a premium, interactive web dashboard:
+```bash
+python app.py
+```
+Then, open your web browser and navigate to: **[http://127.0.0.1:5000/](http://127.0.0.1:5000/)**
+
+#### 2. Console-Based Menu (Original 🖥️)
+```bash
 python main.py
 ```
 
 ### Running Tests
 
 ```bash
-# Run all tests
-pytest tests/ -v
+# Run all tests (including core models & Flask web endpoints)
+python -m pytest tests/ -v
 
-# With coverage report
-pytest tests/ -v --cov=library --cov-report=term-missing
+# Run with coverage report
+python -m pytest tests/ -v --cov=library --cov-report=term-missing
 ```
 
 ---
