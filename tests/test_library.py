@@ -318,3 +318,22 @@ def test_manager_filter_by_category(manager):
     sci_books = manager.list_books(category="Science")
     assert all(b.category == "Science" for b in sci_books)
     assert len(sci_books) == 1
+
+
+def test_manager_toggle_member_status(manager):
+    member = manager.register_member("John Doe", "john@test.com", "0300-999")
+    assert member.is_active is True
+    manager.toggle_member_status(member.person_id)
+    assert member.is_active is False
+    manager.toggle_member_status(member.person_id)
+    assert member.is_active is True
+
+
+def test_manager_update_member(manager):
+    member = manager.register_member("Jane Doe", "jane@test.com", "0300-888", "Standard")
+    manager.update_member(member.person_id, name="Jane Smith", email="jane.smith@test.com", phone="0300-777", membership_type="Premium")
+    updated = manager.get_member(member.person_id)
+    assert updated.name == "Jane Smith"
+    assert updated.email == "jane.smith@test.com"
+    assert updated.phone == "0300-777"
+    assert updated.membership_type == "Premium"

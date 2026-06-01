@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Loans Manager - SmartLMS{% endblock %}
+
+{% block header_title %}Loans Manager{% endblock %}
+{% block header_subtitle %}Issue new book checkouts and process returns/fines{% endblock %}
+
+{% block content %}
+<!-- Issue Loan Section -->
+<section class="panel" id="issue-loan-panel">
+    <div class="panel-header">
+        <h2 class="panel-title">📤 Issue New Book Loan</h2>
+    </div>
+
+    <form method="POST" action="{{ url_for('loan_borrow') }}" class="loan-form">
+        <div class="form-grid">
+            <!-- Select Member -->
+            <div class="form-group">
+                <label for="member_id">Library Member *</label>
+                <select id="member_id" name="member_id" class="form-control" required>
+                    <option value="" disabled selected>-- Select Active Member --</option>
+                    {% for m in active_members %}
+                        <option value="{{ m.person_id }}">[{{ m.person_id }}] {{ m.name }} (Loans: {{ m.active_loans|length }}/{{ m.MAX_BORROW_LIMIT if m.MAX_BORROW_LIMIT is defined else 5 }})</option>
+                    {% else %}
+                        <option value="" disabled>No active members registered</option>
+                    {% endfor %}
+                </select>
+                {% if not active_members %}
+                    <small class="text-danger">⚠️ You must register an active member first.</small>
+                {% endif %}
+            </div>
+
+            <!-- Select Book -->
+            <div class="form-group">
+                <label for="book_id">Available Book *</label>
+                <select id="book_id" name="book_id" class="form-control" required>
+                    <option value="" disabled selected>-- Select Book --</option>
+                    {% for b in available_books %}
+                        <option value="{{ b.book_id }}">[{{ b.book_id }}] {{ b.title }} by {{ b.author }} (Available: {{ b.available_copies }}/{{ b.total_copies }})</option>
+                    {% else %}
+                        <option value="" disabled>No books available in catalog</option>
+                    {% endfor %}
+                </select>
+                {% if not available_books %}
+                    <small class="text-danger">⚠️ No books are currently available in the catalog.</small>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 1rem; border-top: none; padding-top: 0;">
+            <button type="submit" class="btn btn-primary" {% if not active_members or not available_books %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %} id="btn-issue-loan">
+                📤 Process Checkout
+            </button>
+        </div>
+    </form>
+</section>
+
+<!-- Active Loans List -->
+<section class="panel" id="active-loans-list-panel">
+    <div class="panel-header">
+        <h2 class="panel-title">🔄 Active Borrowing Records</h2>
+        <span class="badge badge-returned">{{ active_loans|length }} Checked out</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table" id="loans-table">
+            <thead>
+                <tr>
+                    <th>Loan ID</th>
+                    <th>Book Details</th>
+                    <th>Member Details</th>
+                    <th>Borrowed Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in active_loans %}
+                <tr id="loan-row-{{ loan.loan_id }}">
+                    <td><code>{{ loan.loan_id }}</code></td>
+                    <td>
+                        <strong>{{ loan.book_title }}</strong><br>
+                        <small class="text-muted">Book ID: {{ loan.book_id }}</small>
+                    </td>
+                    <td>
+                        <strong>{{ loan.member_name }}</strong><br>
+                        <small class="text-muted">Member ID: {{ loan.member_id }}</small>
+                    </td>
+                    <td>{{ loan.borrow_date[:10] }}</td>
+                    <td>
+                        <span>{{ loan.due_date }}</span><br>
+                        <small class="text-muted">
+                            {% if loan.days_remaining() >= 0 %}
+                                ({{ loan.days_remaining() }} days remaining)
+                            {% else %}
+                                (<span style="color: var(--danger); font-weight: 600;">Overdue by {{ loan.days_remaining()|abs }} days</span>)
+                            {% endif %}
+                        </small>
+                    </td>
+                    <td>
+                        {% if loan.is_overdue() %}
+                            <span class="badge badge-overdue" title="Overdue fine applies">Overdue 🚨</span><br>
+                            <small style="color: var(--danger); font-weight: 700;">PKR {{ "%.0f"|format(loan.calculate_fine()) }}</small>
+                        {% else %}
+                            <span class="badge badge-active">On Time ✅</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                        <form action="{{ url_for('loan_return', loan_id=loan.loan_id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-success btn-sm" id="btn-return-loan-{{ loan.loan_id }}">↩️ Check-in (Return)</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-muted" style="text-align: center; padding: 3rem;">
+                        No active loans found. All books are returned!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
