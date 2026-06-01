@@ -172,8 +172,6 @@ Tests cover all major modules with 30+ test functions:
 | Member 1 | Book & Loan Module |
 | Member 2 | Member Management & UI |
 | Member 3 | File Handling & Testing |
-| Member 4 | Manager & Integration |
-| Member 5 | Documentation & README |
 
 ---
 
