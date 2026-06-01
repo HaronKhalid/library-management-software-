@@ -167,6 +167,39 @@ class LibraryManager:
             if query in m.name.lower() or query in m.email.lower()
         ]
 
+    def toggle_member_status(self, member_id: str) -> Member:
+        """Toggle a member's active/inactive status."""
+        member = self._get_member_or_raise(member_id)
+        if member.is_active:
+            member.deactivate()
+        else:
+            member.activate()
+        self._save_all()
+        return member
+
+    def update_member(self, member_id: str, name: str = None, email: str = None,
+                      phone: str = None, membership_type: str = None) -> Member:
+        """Update member details (name, email, phone, membership_type)."""
+        member = self._get_member_or_raise(member_id)
+
+        new_name = name.strip() if name is not None else member.name
+        new_email = email.strip() if email is not None else member.email
+        new_phone = phone.strip() if phone is not None else member.phone
+        new_m_type = membership_type.strip() if membership_type is not None else member.membership_type
+
+        self._validate_person_fields(new_name, new_email, new_phone)
+
+        if new_email.lower() != member.email.lower():
+            self._check_email_unique(new_email)
+
+        member.name = new_name
+        member.email = new_email
+        member.phone = new_phone
+        member._membership_type = new_m_type
+
+        self._save_all()
+        return member
+
     # =========================================================
     # LIBRARIAN MANAGEMENT
     # =========================================================
