@@ -1,4 +1,4 @@
-# 📚 Library Management System
+# Library Management System
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -8,7 +8,7 @@ A fully modular, console-based Library Management System built with Python, demo
 
 ---
 
-## 📖 Overview
+## Overview
 
 This system manages the day-to-day operations of a library:
 - Book catalogue management
@@ -19,18 +19,18 @@ This system manages the day-to-day operations of a library:
 
 ---
 
-## ✨ Features
+## Features
 
 | Feature | Description |
 |---|---|
-| 📖 Book Management | Add, remove, search, filter by category |
-| 👥 Member Management | Register members, view profiles and loan history |
-| 📋 Loan Management | Borrow/return books, track overdue loans |
-| 💰 Fine Calculation | Automatic PKR 5/day fine for overdue returns |
-| 💾 File Persistence | All data saved as JSON — no database needed |
-| 🔍 Search | Search books (title/author/ISBN) & members |
-| 📊 Statistics | Live dashboard of library metrics |
-| 🧪 Unit Tests | 30+ tests with PyTest covering all modules |
+| Book Management | Add, remove, search, filter by category |
+| Member Management | Register members, view profiles and loan history |
+| Loan Management | Borrow/return books, track overdue loans |
+| Fine Calculation | Automatic PKR 5/day fine for overdue returns |
+| File Persistence | All data saved as JSON — no database needed |
+| Search | Search books (title/author/ISBN) & members |
+| Statistics | Live dashboard of library metrics |
+| Unit Tests | 30+ tests with PyTest covering all modules |
 
 ---
 
@@ -63,7 +63,7 @@ LibraryMS/
 
 ---
 
-## ⚙️ OOP Design
+## OOP Design
 
 ```
 Person (Base Class)
@@ -84,7 +84,7 @@ LibraryManager (Composition)
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Python 3.8+
@@ -98,24 +98,37 @@ cd LibraryMS
 
 # Install dependencies
 pip install -r requirements.txt
+```
 
-# Run the application
+### Running the Application
+
+You can run the application in two modes:
+
+#### 1. Web UI Interface (Recommended)
+Build using Flask, providing a premium, interactive web dashboard:
+```bash
+python app.py
+```
+Then, open your web browser and navigate to: **[http://127.0.0.1:5000/](http://127.0.0.1:5000/)**
+
+#### 2. Console-Based Menu (Original)
+```bash
 python main.py
 ```
 
 ### Running Tests
 
 ```bash
-# Run all tests
-pytest tests/ -v
+# Run all tests (including core models & Flask web endpoints)
+python -m pytest tests/ -v
 
-# With coverage report
-pytest tests/ -v --cov=library --cov-report=term-missing
+# Run with coverage report
+python -m pytest tests/ -v --cov=library --cov-report=term-missing
 ```
 
 ---
 
-## 📂 Data Storage
+## Data Storage
 
 All data is stored as human-readable JSON files in the `data/` directory:
 
@@ -129,7 +142,7 @@ Data persists between sessions automatically.
 
 ---
 
-## 🔧 Exception Handling
+## Exception Handling
 
 The system handles:
 - Invalid inputs (empty fields, invalid email)
@@ -141,7 +154,7 @@ The system handles:
 
 ---
 
-## 📊 Statistics Dashboard
+## Statistics Dashboard
 
 The statistics view provides:
 - Total book titles and copies
@@ -152,7 +165,7 @@ The statistics view provides:
 
 ---
 
-## 🧪 Testing
+## Testing
 
 Tests cover all major modules with 30+ test functions:
 
@@ -165,7 +178,7 @@ Tests cover all major modules with 30+ test functions:
 
 ---
 
-## 👥 Group Members
+## Group Members
 
 | Name | Role |
 |---|---|
@@ -175,7 +188,7 @@ Tests cover all major modules with 30+ test functions:
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Language:** Python 3.8+
 - **Storage:** JSON files
@@ -184,6 +197,6 @@ Tests cover all major modules with 30+ test functions:
 
 ---
 
-## 📄 License
+## License
 
 This project is open-source under the MIT License.

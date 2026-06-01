@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Members Registry - SmartLMS{% endblock %}
+
+{% block header_title %}Members Registry{% endblock %}
+{% block header_subtitle %}Manage library accounts, borrowing privileges, and staff roles{% endblock %}
+
+{% block content %}
+<section class="panel" id="members-registry-panel">
+    <!-- Tabs Header -->
+    <div class="tabs-header">
+        <button class="tab-btn active" data-target="members-tab" id="btn-tab-members">👥 Library Members</button>
+        <button class="tab-btn" data-target="librarians-tab" id="btn-tab-librarians">👔 Librarian Staff</button>
+    </div>
+
+    <!-- Members Pane -->
+    <div class="tab-pane active" id="members-tab">
+        <div class="panel-header" style="border-bottom: none; margin-bottom: 1rem; padding-bottom: 0;">
+            <h2 class="panel-title" style="font-size: 1.1rem;">Registered Members</h2>
+            <a href="{{ url_for('member_register') }}" class="btn btn-primary btn-sm" id="btn-add-member-registry">➕ Register New Member</a>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table" id="members-table">
+                <thead>
+                    <tr>
+                        <th>Member ID</th>
+                        <th>Name & Email</th>
+                        <th>Phone</th>
+                        <th>Type</th>
+                        <th>Active Loans</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in members %}
+                    <tr id="member-row-{{ m.person_id }}">
+                        <td><code>{{ m.person_id }}</code></td>
+                        <td>
+                            <strong>{{ m.name }}</strong><br>
+                            <small class="text-muted">{{ m.email }}</small>
+                        </td>
+                        <td><code>{{ m.phone }}</code></td>
+                        <td><span class="badge badge-category" style="background-color: rgba(139, 92, 246, 0.15); color: var(--primary-color);">{{ m.membership_type }}</span></td>
+                        <td>
+                            <span class="badge badge-returned">{{ m.active_loans|length }}/{{ m.MAX_BORROW_LIMIT }}</span>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('member_toggle', member_id=m.person_id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="badge {% if m.is_active %}badge-active{% else %}badge-inactive{% endif %}" style="border: none; cursor: pointer;" title="Click to toggle status" id="btn-toggle-status-{{ m.person_id }}">
+                                    {% if m.is_active %}Active ✅{% else %}Suspended ❌{% endif %}
+                                </button>
+                            </form>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="display: inline-flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                                <a href="{{ url_for('member_detail', member_id=m.person_id) }}" class="btn btn-secondary btn-sm" id="btn-view-member-{{ m.person_id }}">👁️ View Profile</a>
+                                <form action="{{ url_for('member_delete', member_id=m.person_id) }}" method="POST" onsubmit="return confirm('Delete this member? This action is irreversible.');" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" id="btn-delete-member-{{ m.person_id }}">🗑️ Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-muted" style="text-align: center; padding: 2rem;">
+                            No library members registered yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Librarians Pane -->
+    <div class="tab-pane" id="librarians-tab">
+        <div class="panel-header" style="border-bottom: none; margin-bottom: 1rem; padding-bottom: 0;">
+            <h2 class="panel-title" style="font-size: 1.1rem;">Librarian Officers</h2>
+            <a href="{{ url_for('librarian_add') }}" class="btn btn-primary btn-sm" id="btn-add-librarian-registry">➕ Add Librarian Staff</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table" id="librarians-table">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name & Email</th>
+                        <th>Phone</th>
+                        <th>Department</th>
+                        <th>System ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in librarians %}
+                    <tr>
+                        <td><code>{{ l.employee_id }}</code></td>
+                        <td>
+                            <strong>{{ l.name }}</strong><br>
+                            <small class="text-muted">{{ l.email }}</small>
+                        </td>
+                        <td><code>{{ l.phone }}</code></td>
+                        <td><span class="badge badge-category">{{ l.department }}</span></td>
+                        <td><code>{{ l.person_id }}</code></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-muted" style="text-align: center; padding: 2rem;">
+                            No librarians added to the registry.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

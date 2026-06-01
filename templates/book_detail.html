@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Book Details - SmartLMS{% endblock %}
+
+{% block header_title %}{{ book.title }}{% endblock %}
+{% block header_subtitle %}Detailed metadata and availability status for book catalog card{% endblock %}
+
+{% block content %}
+<div class="detail-layout">
+    <!-- Sidebar Details -->
+    <aside class="detail-sidebar" id="book-detail-sidebar">
+        <div class="profile-card">
+            <div class="profile-avatar" style="background: var(--accent-gradient);">📖</div>
+            <h2 class="profile-name">{{ book.title }}</h2>
+            <p class="profile-role" style="color: var(--text-secondary);">by {{ book.author }}</p>
+            
+            <ul class="info-list">
+                <li class="info-item">
+                    <span class="info-label">Book ID</span>
+                    <span class="info-value"><code>{{ book.book_id }}</code></span>
+                </li>
+                <li class="info-item">
+                    <span class="info-label">ISBN</span>
+                    <span class="info-value"><code>{{ book.isbn }}</code></span>
+                </li>
+                <li class="info-item">
+                    <span class="info-label">Category</span>
+                    <span class="info-value"><span class="badge badge-category">{{ book.category }}</span></span>
+                </li>
+                <li class="info-item">
+                    <span class="info-label">Publish Year</span>
+                    <span class="info-value">{{ book.publication_year }}</span>
+                </li>
+                <li class="info-item">
+                    <span class="info-label">Added Date</span>
+                    <span class="info-value"><small>{{ book.added_at }}</small></span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Action Panel -->
+        <section class="panel" style="padding: 1.5rem;" id="book-action-panel">
+            <h3 class="panel-title" style="font-size: 1.1rem; margin-bottom: 1rem;">Actions</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <a href="{{ url_for('book_edit', book_id=book.book_id) }}" class="btn btn-primary" id="btn-detail-edit">✏️ Edit Details</a>
+                <a href="{{ url_for('loans') }}" class="btn btn-secondary" id="btn-detail-borrow">🔄 Issue Borrowing</a>
+                <form action="{{ url_for('book_delete', book_id=book.book_id) }}" method="POST" onsubmit="return confirm('Remove this book from database permanently?');">
+                    <button type="submit" class="btn btn-danger" style="width: 100%;" id="btn-detail-delete">🗑️ Remove Book</button>
+                </form>
+                <a href="{{ url_for('books') }}" class="btn btn-secondary" style="text-align: center;" id="btn-detail-back">← Back to Catalog</a>
+            </div>
+        </section>
+    </aside>
+
+    <!-- Main Activity Logs -->
+    <section class="panel" style="margin-bottom: 0;" id="book-history-panel">
+        <div class="panel-header">
+            <h2 class="panel-title">📊 Availability Status</h2>
+            {% if book.is_available() %}
+                <span class="badge badge-active">Available for borrowing</span>
+            {% else %}
+                <span class="badge badge-overdue">No copies available</span>
+            {% endif %}
+        </div>
+        
+        <div class="stats-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 2rem;">
+            <div class="stat-card" style="padding: 1rem;">
+                <div class="stat-info">
+                    <span class="stat-label">Total Copies Owned</span>
+                    <span class="stat-value" style="font-size: 1.3rem;">{{ book.total_copies }}</span>
+                </div>
+            </div>
+            <div class="stat-card" style="padding: 1rem;">
+                <div class="stat-info">
+                    <span class="stat-label">Available on Shelf</span>
+                    <span class="stat-value" style="font-size: 1.3rem; color: {% if book.is_available() %}var(--success){% else %}var(--danger){% endif %};">
+                        {{ book.available_copies }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-header" style="margin-top: 2rem;">
+            <h2 class="panel-title">🔄 Active Loans for this Book</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="table" id="book-loans-table">
+                <thead>
+                    <tr>
+                        <th>Loan ID</th>
+                        <th>Borrowed By</th>
+                        <th>Issued On</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in active_loans %}
+                    <tr>
+                        <td><code>{{ loan.loan_id }}</code></td>
+                        <td>{{ loan.member_name }}</td>
+                        <td>{{ loan.borrow_date[:10] }}</td>
+                        <td>{{ loan.due_date }}</td>
+                        <td>
+                            {% if loan.is_overdue() %}
+                                <span class="badge badge-overdue">Overdue</span>
+                            {% else %}
+                                <span class="badge badge-active">Active</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-muted" style="text-align: center; padding: 2rem;">
+                            No active loans for this book. All copies on shelf.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

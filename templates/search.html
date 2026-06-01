@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Search Catalog - SmartLMS{% endblock %}
+
+{% block header_title %}Search Catalog{% endblock %}
+{% block header_subtitle %}Search library books or members databases{% endblock %}
+
+{% block content %}
+<section class="panel" id="search-panel">
+    <div class="panel-header">
+        <h2 class="panel-title">🔍 Unified Catalog Search</h2>
+    </div>
+
+    <!-- Search Form -->
+    <form method="GET" action="{{ url_for('search') }}" class="search-form">
+        <div class="form-grid" style="grid-template-columns: 3fr 1fr;">
+            <div class="form-group">
+                <label for="query">Search Query</label>
+                <input type="text" id="query" name="query" class="form-control" placeholder="Search by title, author, ISBN, name, email..." value="{{ query or '' }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="type">Database Table</label>
+                <select id="type" name="type" class="form-control">
+                    <option value="books" {% if search_type == 'books' %}selected{% endif %}>📚 Books Catalog</option>
+                    <option value="members" {% if search_type == 'members' %}selected{% endif %}>👥 Member Directory</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-actions" style="margin-top: 1rem; border-top: none; padding-top: 0;">
+            <button type="submit" class="btn btn-primary" id="btn-submit-search">🔍 Execute Search</button>
+        </div>
+    </form>
+</section>
+
+{% if query %}
+<section class="panel" id="results-panel">
+    <div class="panel-header">
+        <h2 class="panel-title">📊 Search Results for "{{ query }}"</h2>
+        <span class="badge badge-returned">{{ results|length }} match(es)</span>
+    </div>
+
+    <div class="table-responsive">
+        {% if search_type == 'books' %}
+        <!-- Books Results Table -->
+        <table class="table" id="search-books-results">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Book Details</th>
+                    <th>ISBN</th>
+                    <th>Category</th>
+                    <th>Availability</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in results %}
+                <tr>
+                    <td><code>{{ book.book_id }}</code></td>
+                    <td>
+                        <strong>{{ book.title }}</strong><br>
+                        <span class="text-muted">by {{ book.author }}</span>
+                    </td>
+                    <td><code>{{ book.isbn }}</code></td>
+                    <td><span class="badge badge-category">{{ book.category }}</span></td>
+                    <td>
+                        {% if book.is_available() %}
+                            <span class="badge badge-active">Available ({{ book.available_copies }}/{{ book.total_copies }})</span>
+                        {% else %}
+                            <span class="badge badge-overdue">Borrowed Out (0/{{ book.total_copies }})</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                        <a href="{{ url_for('book_detail', book_id=book.book_id) }}" class="btn btn-secondary btn-sm" id="btn-search-view-{{ book.book_id }}">👁️ View</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-muted" style="text-align: center; padding: 2rem;">
+                        No books found matching query.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% else %}
+        <!-- Members Results Table -->
+        <table class="table" id="search-members-results">
+            <thead>
+                <tr>
+                    <th>Member ID</th>
+                    <th>Name & Email</th>
+                    <th>Phone</th>
+                    <th>Type</th>
+                    <th>Loans</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in results %}
+                <tr>
+                    <td><code>{{ m.person_id }}</code></td>
+                    <td>
+                        <strong>{{ m.name }}</strong><br>
+                        <small class="text-muted">{{ m.email }}</small>
+                    </td>
+                    <td><code>{{ m.phone }}</code></td>
+                    <td><span class="badge badge-category">{{ m.membership_type }}</span></td>
+                    <td><span class="badge badge-returned">{{ m.active_loans|length }} Active</span></td>
+                    <td>
+                        <span class="badge {% if m.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                            {% if m.is_active %}Active{% else %}Suspended{% endif %}
+                        </span>
+                    </td>
+                    <td style="text-align: right;">
+                        <a href="{{ url_for('member_detail', member_id=m.person_id) }}" class="btn btn-secondary btn-sm" id="btn-search-view-member-{{ m.person_id }}">👁️ View Profile</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-muted" style="text-align: center; padding: 2rem;">
+                        No members found matching query.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

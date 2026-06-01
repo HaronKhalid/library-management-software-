@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SmartLMS{% endblock %}
+
+{% block header_title %}Library Dashboard{% endblock %}
+{% block header_subtitle %}Overview of library catalogs, transactions, and metrics{% endblock %}
+
+{% block content %}
+<!-- Stats Grid -->
+<section class="stats-grid">
+    <div class="stat-card" id="stat-titles">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);">📚</div>
+        <div class="stat-info">
+            <span class="stat-label">Total Titles</span>
+            <span class="stat-value">{{ stats.total_titles }}</span>
+        </div>
+    </div>
+    <div class="stat-card" id="stat-copies">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%);">📖</div>
+        <div class="stat-info">
+            <span class="stat-label">Total Copies</span>
+            <span class="stat-value">{{ stats.total_copies }}</span>
+        </div>
+    </div>
+    <div class="stat-card" id="stat-available">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);">✅</div>
+        <div class="stat-info">
+            <span class="stat-label">Available Copies</span>
+            <span class="stat-value">{{ stats.available_copies }}</span>
+        </div>
+    </div>
+    <div class="stat-card" id="stat-borrowed">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">📤</div>
+        <div class="stat-info">
+            <span class="stat-label">Borrowed Copies</span>
+            <span class="stat-value">{{ stats.borrowed_copies }}</span>
+        </div>
+    </div>
+    <div class="stat-card" id="stat-members">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);">👥</div>
+        <div class="stat-info">
+            <span class="stat-label">Total Members</span>
+            <span class="stat-value">{{ stats.total_members }}</span>
+        </div>
+    </div>
+    <div class="stat-card" id="stat-loans">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);">📋</div>
+        <div class="stat-info">
+            <span class="stat-label">Active Loans</span>
+            <span class="stat-value">{{ stats.active_loans }}</span>
+        </div>
+    </div>
+    <div class="stat-card" id="stat-overdue">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);">⚠️</div>
+        <div class="stat-info">
+            <span class="stat-label">Overdue Loans</span>
+            <span class="stat-value" style="color: {% if stats.overdue_loans > 0 %}var(--danger){% else %}inherit{% endif %};">
+                {{ stats.overdue_loans }}
+            </span>
+        </div>
+    </div>
+    <div class="stat-card" id="stat-fines">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #d97706 0%, #fbbf24 100%);">💰</div>
+        <div class="stat-info">
+            <span class="stat-label">Total Fines</span>
+            <span class="stat-value" style="color: {% if stats.total_fines > 0 %}var(--warning){% else %}inherit{% endif %};">
+                PKR {{ "%.2f"|format(stats.total_fines) }}
+            </span>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Actions Panel -->
+<section class="panel" id="quick-actions-panel">
+    <div class="panel-header">
+        <h2 class="panel-title">⚡ Quick Actions</h2>
+    </div>
+    <div class="filter-bar" style="margin-bottom: 0;">
+        <a href="{{ url_for('book_add') }}" class="btn btn-primary" id="btn-add-book">➕ Add Book</a>
+        <a href="{{ url_for('member_register') }}" class="btn btn-secondary" id="btn-reg-member">👤 Register Member</a>
+        <a href="{{ url_for('loans') }}" class="btn btn-secondary" id="btn-new-loan">🔄 Issue Loan</a>
+        <a href="{{ url_for('librarian_add') }}" class="btn btn-secondary" id="btn-add-lib">👔 Add Librarian</a>
+    </div>
+</section>
+
+<!-- Active & Overdue Tables Panel -->
+<div class="detail-layout">
+    <!-- Overdue Loans Section -->
+    <section class="panel" style="margin-bottom: 0;" id="overdue-loans-section">
+        <div class="panel-header">
+            <h2 class="panel-title" style="color: var(--danger);">🚨 Overdue Loans</h2>
+            <span class="badge badge-overdue">{{ overdue_loans|length }} Overdue</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Member</th>
+                        <th>Fine</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in overdue_loans %}
+                    <tr>
+                        <td>
+                            <strong>{{ loan.book_title }}</strong><br>
+                            <small class="text-muted">{{ loan.book_id }}</small>
+                        </td>
+                        <td>{{ loan.member_name }}</td>
+                        <td style="color: var(--danger); font-weight: bold;">PKR {{ "%.0f"|format(loan.calculate_fine()) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-muted" style="text-align: center; padding: 2rem;">
+                            No overdue loans! Clean record! 🎉
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Active Loans Section -->
+    <section class="panel" style="margin-bottom: 0;" id="active-loans-section">
+        <div class="panel-header">
+            <h2 class="panel-title">🔄 Recent Active Loans</h2>
+            <span class="badge badge-returned">{{ active_loans|length }} Active</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Member</th>
+                        <th>Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in active_loans[:5] %}
+                    <tr>
+                        <td>
+                            <strong>{{ loan.book_title }}</strong><br>
+                            <small class="text-muted">{{ loan.book_id }}</small>
+                        </td>
+                        <td>{{ loan.member_name }}</td>
+                        <td>
+                            <span>{{ loan.due_date }}</span><br>
+                            <small class="{% if loan.days_remaining() < 3 %}badge-overdue{% else %}badge-active{% endif %}" style="padding: 1px 6px; font-size: 0.75rem; border-radius: 4px;">
+                                {% if loan.days_remaining() >= 0 %}
+                                    {{ loan.days_remaining() }} days left
+                                {% else %}
+                                    Overdue!
+                                {% endif %}
+                            </small>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-muted" style="text-align: center; padding: 2rem;">
+                            No books currently checked out.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A premium and modular Library Management System built with Python, Flask, and Vanilla CSS.">
+    <title>{% block title %}LMS - Library Management System{% endblock %}</title>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-logo">📚</span>
+                <span class="brand-name">SmartLMS</span>
+            </div>
+            
+            <nav class="nav-menu">
+                <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+                    <a href="{{ url_for('index') }}" class="nav-link" id="nav-dashboard">
+                        <span>📊</span>
+                        <span class="nav-link-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path.startswith('/books') or request.path.startswith('/book/') %}active{% endif %}">
+                    <a href="{{ url_for('books') }}" class="nav-link" id="nav-books">
+                        <span>📖</span>
+                        <span class="nav-link-text">Book Catalog</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path.startswith('/members') or request.path.startswith('/member/') %}active{% endif %}">
+                    <a href="{{ url_for('members') }}" class="nav-link" id="nav-members">
+                        <span>👥</span>
+                        <span class="nav-link-text">Members Registry</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path.startswith('/loans') %}active{% endif %}">
+                    <a href="{{ url_for('loans') }}" class="nav-link" id="nav-loans">
+                        <span>🔄</span>
+                        <span class="nav-link-text">Loans Manager</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if request.path == '/search' %}active{% endif %}">
+                    <a href="{{ url_for('search') }}" class="nav-link" id="nav-search">
+                        <span>🔍</span>
+                        <span class="nav-link-text">Catalog Search</span>
+                    </a>
+                </li>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle dark/light theme">
+                    <span id="theme-icon">🌙</span>
+                    <span id="theme-text" class="theme-toggle-text">Dark Mode</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-wrapper">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>{% block header_title %}Library Dashboard{% endblock %}</h1>
+                    <p>{% block header_subtitle %}Welcome to the Library Management System{% endblock %}</p>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar">Admin</div>
+                    <span class="role-badge">Librarian</span>
+                </div>
+            </header>
+
+            <!-- Alerts (Flash Messages) -->
+            <div class="alerts-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category if category != 'error' else 'danger' }}" role="alert">
+                                <span>{{ message }}</span>
+                                <button type="button" class="alert-close" aria-label="Close">&times;</button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Page Content -->
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Script Files -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
