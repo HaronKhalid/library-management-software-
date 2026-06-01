@@ -34,7 +34,7 @@ This system manages the day-to-day operations of a library:
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 LibraryMS/
