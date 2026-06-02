@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}{% if book %}Edit Book - SmartLMS{% else %}Add Book - SmartLMS{% endblock %}{% endif %}
+{% block title %}{% if book %}Edit Book - SmartLMS{% else %}Add Book - SmartLMS{% endif %}{% endblock %}
 
-{% block header_title %}{% if book %}Edit Book: {{ book.title }}{% else %}Add New Book{% endblock %}{% endif %}
-{% block header_subtitle %}{% if book %}Modify catalog record details{% else %}Enter book parameters to insert into inventory{% endblock %}{% endif %}
+{% block header_title %}{% if book %}Edit Book: {{ book.title }}{% else %}Add New Book{% endif %}{% endblock %}
+{% block header_subtitle %}{% if book %}Modify catalog record details{% else %}Enter book parameters to insert into inventory{% endif %}{% endblock %}
 
 {% block content %}
 <section class="panel" style="max-width: 800px; margin: 0 auto 2.5rem auto;" id="book-form-panel">
