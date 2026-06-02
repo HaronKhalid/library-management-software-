@@ -45,7 +45,12 @@ def test_books_list_route(client):
 
 
 def test_book_add_and_details_route(client):
-    # Add a book via form
+    # Test GET request for the add book form
+    rv = client.get("/book/add")
+    assert rv.status_code == 200
+    assert b"Add New Book" in rv.data
+
+    # Add a book via form POST
     post_data = {
         "title": "Unit Test Book",
         "author": "Test Author",
@@ -63,6 +68,11 @@ def test_book_add_and_details_route(client):
     assert rv.status_code == 200
     assert b"BK0001" in rv.data
     assert b"Unit Test Book" in rv.data
+
+    # Test GET request for the edit book form
+    rv = client.get("/book/edit/BK0001")
+    assert rv.status_code == 200
+    assert b"Edit Book: Unit Test Book" in rv.data
 
 
 def test_member_register_route(client):
