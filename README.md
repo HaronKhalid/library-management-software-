@@ -63,6 +63,62 @@ LibraryMS/
 
 ---
 
+## Web UI Gallery
+
+### Main Views
+<table width="100%">
+  <tr>
+    <td width="50%" align="center">
+      <b>Dashboard (Statistics & Overview)</b><br/>
+      <img src="screenshots/dashboard.png" width="100%" alt="Dashboard"/>
+    </td>
+    <td width="50%" align="center">
+      <b>Books Catalogue (List & Filters)</b><br/>
+      <img src="screenshots/books_list.png" width="100%" alt="Books List"/>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <b>Book Details (Info & Active Loans)</b><br/>
+      <img src="screenshots/book_detail.png" width="100%" alt="Book Detail"/>
+    </td>
+    <td width="50%" align="center">
+      <b>Loans Management (Borrow & Active Loans)</b><br/>
+      <img src="screenshots/loans_list.png" width="100%" alt="Loans List"/>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <b>Member Profile (Loans & History)</b><br/>
+      <img src="screenshots/member_detail.png" width="100%" alt="Member Detail"/>
+    </td>
+    <td width="50%" align="center">
+      <b>Unified Search (Filters & Query)</b><br/>
+      <img src="screenshots/search_results.png" width="100%" alt="Search Results"/>
+    </td>
+  </tr>
+</table>
+
+### Forms & Input Fields
+<table width="100%">
+  <tr>
+    <td width="33%" align="center">
+      <b>Add Book Form</b><br/>
+      <img src="screenshots/add_book_form.png" width="100%" alt="Add Book Form"/>
+    </td>
+    <td width="33%" align="center">
+      <b>Register Member</b><br/>
+      <img src="screenshots/register_member_form.png" width="100%" alt="Register Member Form"/>
+    </td>
+    <td width="33%" align="center">
+      <b>Add Librarian</b><br/>
+      <img src="screenshots/add_librarian_form.png" width="100%" alt="Add Librarian Form"/>
+    </td>
+  </tr>
+</table>
+
+---
+
 ## OOP Design
 
 ```
